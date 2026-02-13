@@ -31,11 +31,12 @@ app.use(express.urlencoded({ extended: true }));
 import userRoutes from './Routes/user.routes.js';
 import gymOwnerRoutes from './Routes/gymOwner.routes.js';
 import nutritionRoutes from './Routes/nutrition.routes.js';
-
+import weightRoutes from './Routes/weight.routes.js';
 
 
 app.use('/api/users', userRoutes);
 app.use('/api/gymOwner', gymOwnerRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/weight', weightRoutes);
 
 export default app;

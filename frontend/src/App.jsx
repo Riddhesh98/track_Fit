@@ -8,6 +8,7 @@ import UserDashboard from './pages/UserDashboard'
 import { OwnerDashboard } from './pages/OwnerDashboard'
 import NutritionPage from './pages/NutritionPage'
 import NutritionEdit from './pages/NutritionEdit'
+import WeightTrack from './pages/WeightTrack'
 
 const App = () => {
   return (
@@ -22,6 +23,8 @@ const App = () => {
       <Route path="/owner-dashboard" element={<OwnerDashboard />} />
 
       <Route path="/nutrition/edit/:id" element={<NutritionEdit />} />
+
+      <Route path="/weight" element={<WeightTrack />} />
     </Routes>
   )
 }

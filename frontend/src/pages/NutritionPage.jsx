@@ -3,6 +3,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit2, FiTrash2, FiCalendar, FiActivity } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import UserLayout from "../components/UserLayout";
 const NutritionPage = () => {
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -81,6 +82,9 @@ const handleDelete = (id) =>{
 } 
 
   return (
+
+    <UserLayout active="nutrition" >
+
     <div className="min-h-screen bg-black text-white px-4 py-6">
       <div className="max-w-md mx-auto space-y-6">
 
@@ -272,6 +276,8 @@ const handleDelete = (id) =>{
 
       </div>
     </div>
+
+     </UserLayout>
   );
 };
 
