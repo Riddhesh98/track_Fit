@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema(
 //token generate for USER_SECRET
 
 userSchema.methods.generateUserToken = function () {
-  return jwt.sign({ id: this._id }, process.env.USER_SECRET, {
+  return jwt.sign({ _id: this._id }, process.env.USER_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
 };

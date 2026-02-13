@@ -6,6 +6,7 @@ import LoginUser from './pages/LoginUser'
 import LoginOwner from './pages/LoginOwner'
 import UserDashboard from './pages/UserDashboard'
 import { OwnerDashboard } from './pages/OwnerDashboard'
+import NutritionPage from './pages/NutritionPage'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <Route path="/register-owner" element={<RegisterOwner />} />
       <Route path="/login-user" element={<LoginUser />} />
       <Route path="/login-owner" element={<LoginOwner />} />
+      <Route path="/nutrition" element={<NutritionPage />} />
       <Route path="/user-dashboard" element={<UserDashboard />} />
       <Route path="/owner-dashboard" element={<OwnerDashboard />} />
     </Routes>
