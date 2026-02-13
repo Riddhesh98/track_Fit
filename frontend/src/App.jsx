@@ -7,6 +7,7 @@ import LoginOwner from './pages/LoginOwner'
 import UserDashboard from './pages/UserDashboard'
 import { OwnerDashboard } from './pages/OwnerDashboard'
 import NutritionPage from './pages/NutritionPage'
+import NutritionEdit from './pages/NutritionEdit'
 
 const App = () => {
   return (
@@ -19,6 +20,8 @@ const App = () => {
       <Route path="/nutrition" element={<NutritionPage />} />
       <Route path="/user-dashboard" element={<UserDashboard />} />
       <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+
+      <Route path="/nutrition/edit/:id" element={<NutritionEdit />} />
     </Routes>
   )
 }

@@ -62,5 +62,33 @@ export const addNutrition = async (req, res) => {
       });
     }
   };
+
+  export const editNutritionEntry = async (req,res) =>{
+      const id = req.params.id;
+    console.log(id);
+      if(!id){
+          return res.status(400).json({message:"Id is required"});
+      }
+
+      const nutrition = await Nutrition.findOneAndUpdate({_id:id},req.body,{new:true});
+      if(!nutrition){
+          return res.status(400).json({message:"Nutrition not found"});
+      }
+      return res.status(200).json({message:"Nutrition updated successfully",data:nutrition});
+  }
+
+
+  export const deleteNutritionEntry = async (req,res) => {
+      const id = req.params.id || req.body.id;
+      if(!id){
+          return res.status(400).json({message:"Id is required"});
+      }
+      const nutrition = await Nutrition.findOneAndDelete({_id:id});
+      if(!nutrition){
+          return res.status(400).json({message:"Nutrition not found"});
+      }
+      return res.status(200).json({message:"Nutrition deleted successfully"});
+  }
+
   
   

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit2, FiTrash2, FiCalendar, FiActivity } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 const NutritionPage = () => {
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -16,6 +17,9 @@ const NutritionPage = () => {
 
   const [history, setHistory] = useState([]);
   const maintenanceCalories = 2500; // example
+const navigate = useNavigate();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
 
   const createEntry = async () => {
@@ -39,6 +43,8 @@ const NutritionPage = () => {
         }
       );
       console.log(res.data);
+      //for re-rendering the page
+      fetchNutrition();
     } catch (err) {
       console.error(err.response?.data || err);
     }
@@ -58,6 +64,21 @@ const NutritionPage = () => {
       console.error(err);
     }
   };
+
+const handleDelete = (id) =>{
+    try {
+      axios.delete(`http://localhost:3000/api/nutrition/delete/${id}`
+        ,
+        {
+          withCredentials: true
+        }
+      );
+      //for re-rendering the page
+      fetchNutrition()
+    } catch (error) {
+      console.error(error);
+    }
+} 
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-6">
@@ -186,13 +207,15 @@ const NutritionPage = () => {
               </div>
               
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => handleUpdate(item)} // replace with your func
-                  className="p-2 bg-gray-800 hover:bg-indigo-600 rounded-lg text-white transition-colors"
-                  title="Edit Entry"
-                >
-                  <FiEdit2 size={14} />
-                </button>
+              <button
+  onClick={() => navigate(`/nutrition/edit/${item._id}`)}
+  className="p-2 bg-gray-800 hover:bg-indigo-600 rounded-lg text-white transition-colors"
+  title="Edit Entry"
+>
+  <FiEdit2 size={14} />
+</button>
+              
+
                 <button 
                   onClick={() => handleDelete(item._id)} // replace with your func
                   className="p-2 bg-gray-800 hover:bg-red-600 rounded-lg text-white transition-colors"
