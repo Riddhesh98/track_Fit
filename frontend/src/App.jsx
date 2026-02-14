@@ -9,6 +9,7 @@ import { OwnerDashboard } from './pages/OwnerDashboard'
 import NutritionPage from './pages/NutritionPage'
 import NutritionEdit from './pages/NutritionEdit'
 import WeightTrack from './pages/WeightTrack'
+import Profile from './pages/Profile'
 
 const App = () => {
   return (
@@ -25,6 +26,8 @@ const App = () => {
       <Route path="/nutrition/edit/:id" element={<NutritionEdit />} />
 
       <Route path="/weight" element={<WeightTrack />} />
+
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   )
 }

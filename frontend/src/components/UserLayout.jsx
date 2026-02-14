@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Input from "./Input";
 
 // Icons
 import {
@@ -121,6 +122,7 @@ const UserLayout = ({ children, active }) => {
               <MenuItem
                 icon={<FiUser />}
                 label="My Profile"
+                active={active === "profile"}
                 onClick={() => handleNav("/profile")}
               />
             </div>

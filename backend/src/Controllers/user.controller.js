@@ -128,9 +128,42 @@ const logout = async(req,res)=>{
 }
 
 
+const updateProfile = async(req,res)=>{
+    const id=req.user._id;
+
+    if(!id){
+        return res.status(400).json({message:"User not found"});
+    }
+try {
+    
+    const user = await User.findOneAndUpdate({_id:id},req.body,{new:true});
+    if(!user){
+        return res.status(400).json({message:"User not found"});
+    }
+    return res.status(200).json({message:"User updated successfully",user});
+} catch (error) {
+    console.log(error);
+    return res.status(500).json({message:error});
+}
+
+}
+
+
+const fetchUserData= async (req,res) => {
+    
+    const id = req.user._id;
+    const user = await User.findOne({_id:id}).select("-password");
+    if(!user){
+        return res.status(400).json({message:"User not found"});
+    }
+    return res.status(200).json({message:"User found successfully",user});
+}
+
 
 export {
     signup,
     login,
-    logout
+    logout,
+    updateProfile,
+    fetchUserData
 }
