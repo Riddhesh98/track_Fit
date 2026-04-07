@@ -9,6 +9,7 @@ const RegisterOwner = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const[JWT_SECRT, setJWT_SECRT] = useState("");
 
   const sumbitHandler = async (e) => {
     e.preventDefault();
@@ -17,6 +18,7 @@ const RegisterOwner = () => {
       name,
       email,
       password,
+      JWT_SECRT
     };
 
  
@@ -57,6 +59,10 @@ const RegisterOwner = () => {
           <input
             onChange={(e) => setPassword(e.target.value)}
           type="password" placeholder="Create Password" required className="w-full h-16 px-6 bg-gray-950 border border-gray-800 rounded-2xl focus:border-indigo-500 outline-none transition-all" />
+
+        <input
+            onChange={(e) => setJWT_SECRT(e.target.value)}
+          type="password" placeholder="JWT Secret" required className="w-full h-16 px-6 bg-gray-950 border border-gray-800 rounded-2xl focus:border-indigo-500 outline-none transition-all" />
 
           <button
           onClick={sumbitHandler}

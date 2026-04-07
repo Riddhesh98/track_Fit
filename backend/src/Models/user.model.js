@@ -70,4 +70,6 @@ userSchema.methods.generateUserToken = function () {
 
 
 
-export const User = mongoose.model('User', userSchema);
+// Check if "User" is already defined in mongoose.models
+// If yes, use it. If no, create a new one.
+export const User = mongoose.models.User || mongoose.model("User", userSchema);

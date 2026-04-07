@@ -32,11 +32,14 @@ import userRoutes from './Routes/user.routes.js';
 import gymOwnerRoutes from './Routes/gymOwner.routes.js';
 import nutritionRoutes from './Routes/nutrition.routes.js';
 import weightRoutes from './Routes/weight.routes.js';
-
+import PRRoutes from './Routes/PR.routes.js';
+import aiRoutes from './Routes/ai.routes.js';
 
 app.use('/api/users', userRoutes);
 app.use('/api/gymOwner', gymOwnerRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/weight', weightRoutes);
+app.use('/api/pr', PRRoutes);
+app.use('/api/ai', aiRoutes);
 
 export default app;

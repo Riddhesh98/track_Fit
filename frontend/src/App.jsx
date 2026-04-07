@@ -10,12 +10,14 @@ import NutritionPage from './pages/NutritionPage'
 import NutritionEdit from './pages/NutritionEdit'
 import WeightTrack from './pages/WeightTrack'
 import Profile from './pages/Profile'
+import PRTrack from './pages/PRTrack'
+import AICoach from './pages/AICoach'
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<ChooseRegister />} />
-      <Route path="/register-user" element={<RegisterUser />} />
+   
+      <Route path="" element={<RegisterUser />} />
       <Route path="/register-owner" element={<RegisterOwner />} />
       <Route path="/login-user" element={<LoginUser />} />
       <Route path="/login-owner" element={<LoginOwner />} />
@@ -28,6 +30,10 @@ const App = () => {
       <Route path="/weight" element={<WeightTrack />} />
 
       <Route path="/profile" element={<Profile />} />
+
+      <Route path="/pr" element={<PRTrack />} />
+
+      <Route path="/ai-coach" element={<AICoach />} />
     </Routes>
   )
 }

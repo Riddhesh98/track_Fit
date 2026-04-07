@@ -17,7 +17,9 @@ const NutritionPage = () => {
   const [showSteps, setShowSteps] = useState(false);
 
   const [history, setHistory] = useState([]);
-  const maintenanceCalories = 2500; // example
+  // const maintenanceCalories = 2500; // example
+
+  const [maintenanceCalories, setMaintenanceCalories] = useState(2500); 
 const navigate = useNavigate();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -53,7 +55,95 @@ const navigate = useNavigate();
   
   useEffect(() => {
     fetchNutrition();
+  
   }, []);
+
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [frequency, setFrequency] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+
+  useEffect(() => {
+
+    const fetchWeightForMaintanceCalories = async () =>{
+      const response = await axios.get("http://localhost:3000/api/users/me", {
+        withCredentials: true,
+      })
+  
+      setWeight(response.data.user.weight);
+      setHeight(response.data.user.height);
+      setFrequency(response.data.user.frequency);
+      setAge(response.data.user.age);
+      setGender(response.data.user.gender);
+  
+      // console.log(response.data.user.weight);
+      // console.log(response.data.user.height);
+      // console.log(response.data.user.frequency);
+      // console.log(response.data.user.age);
+      // console.log(response.data.user.gender);
+  
+      // console.log("weight", weight);
+      // console.log("height", height);
+      // console.log("frequency", frequency);
+      // console.log("age", age);
+      // console.log("gender", gender);
+    
+    
+     
+  // convert string inputs to numbers
+  const bodyWeight = Number(weight);
+  const bodyHeight = Number(height);
+  const trainingFrequency = Number(frequency);
+  const userAge = Number(age);
+  const userGender = gender;
+  
+  // console.log("bodyWeight", bodyWeight, "bodyHeight", bodyHeight, "trainingFrequency", trainingFrequency, "userAge", userAge, "userGender", userGender);
+  
+  // 1️⃣ BMR (Mifflin–St Jeor)
+  let bmr;
+  
+  if (userGender === "female") {
+    bmr =
+      10 * bodyWeight +
+      6.25 * bodyHeight -
+      5 * userAge -
+      161;
+  } else {
+    bmr =
+      10 * bodyWeight +
+      6.25 * bodyHeight -
+      5 * userAge +
+      5;
+  }
+  
+  console.log(bmr);
+  
+  // 2️⃣ Activity multiplier based on training frequency
+  let activityMultiplier = 1.2;
+  
+  if (trainingFrequency <= 1) activityMultiplier = 1.2;
+  else if (trainingFrequency <= 3) activityMultiplier = 1.375;
+  else if (trainingFrequency <= 5) activityMultiplier = 1.55;
+  else if (trainingFrequency === 6) activityMultiplier = 1.725;
+  else if (trainingFrequency >= 7) activityMultiplier = 1.9;
+  
+  // 3️⃣ Final daily calories (maintenance)
+  let dailyCalories = Math.round(bmr * activityMultiplier);
+  
+ if(dailyCalories<2000){
+  setMaintenanceCalories(2500);
+
+ }
+ else{
+  setMaintenanceCalories(dailyCalories);
+ }
+      
+     
+    }
+    fetchWeightForMaintanceCalories();
+  }, [weight, height, frequency, age, gender]);
+  
 
   const fetchNutrition = async () => {
     try {

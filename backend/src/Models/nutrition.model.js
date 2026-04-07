@@ -18,18 +18,22 @@ const nutritionSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Calories are required'],
       min: [0, 'Calories cannot be negative'],
+      max:[50000, 'Calories cannot exceed 50,000'],
     },
     protein: {
       type: Number,
       min: [0, 'Protein cannot be negative'],
+      max: [1000, 'cannot exceed 1,000'],
     },
     carbs: {
       type: Number,
       min: [0, 'Carbs cannot be negative'],
+      max: [1000, 'cannot exceed 1,000'],
     },
     fats: {
       type: Number,
       min: [0, 'Fat cannot be negative'],
+      max: [1000, 'cannot exceed 1,000'],
     },
     steps: {
       type: Number,

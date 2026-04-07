@@ -82,12 +82,12 @@ const UserLayout = ({ children, active }) => {
 
             {/* Menu */}
             <div className="space-y-2 flex-1">
-              <MenuItem
+              {/* <MenuItem
                 icon={<FiHome />}
                 label="Dashboard"
                 active={active === "dashboard"}
                 onClick={() => handleNav("/user-dashboard")}
-              />
+              /> */}
 
               <MenuItem
                 icon={<MdOutlineRestaurant />}
@@ -107,14 +107,18 @@ const UserLayout = ({ children, active }) => {
                 icon={<FiAward />}
                 label="PR Track"
                 active={active === "pr"}
-                onClick={() => handleNav("/pr-track")}
+                onClick={() => handleNav("/pr")}
               />
 
               {/* Coming soon */}
-              <div className="opacity-50 cursor-not-allowed flex items-center gap-4 p-3">
-                <FiZap />
-                AI Coach
-              </div>
+              <MenuItem
+                icon={<FiZap />}
+                label="AI Coach"
+                active={active === "ai-coach"}
+                onClick={() => handleNav("/ai-coach")}
+              />
+
+
             </div>
 
             {/* Bottom */}
