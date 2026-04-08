@@ -12,6 +12,7 @@ import {
   FiAward,
   FiZap,
   FiUser,
+  FiLogOut,
 } from "react-icons/fi";
 import { MdOutlineRestaurant } from "react-icons/md";
 
@@ -22,6 +23,17 @@ const UserLayout = ({ children, active }) => {
   const handleNav = (path) => {
     navigate(path);
     setOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:3000/api/users/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (_) {}
+    localStorage.clear();
+    navigate("/login-user");
   };
 
   return (
@@ -82,12 +94,12 @@ const UserLayout = ({ children, active }) => {
 
             {/* Menu */}
             <div className="space-y-2 flex-1">
-              {/* <MenuItem
+              <MenuItem
                 icon={<FiHome />}
                 label="Dashboard"
                 active={active === "dashboard"}
                 onClick={() => handleNav("/user-dashboard")}
-              /> */}
+              />
 
               <MenuItem
                 icon={<MdOutlineRestaurant />}
@@ -122,13 +134,20 @@ const UserLayout = ({ children, active }) => {
             </div>
 
             {/* Bottom */}
-            <div className="border-t border-gray-800 pt-6">
+            <div className="border-t border-gray-800 pt-6 space-y-1">
               <MenuItem
                 icon={<FiUser />}
                 label="My Profile"
                 active={active === "profile"}
                 onClick={() => handleNav("/profile")}
               />
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-4 w-full p-3 rounded-xl transition text-gray-400 hover:bg-red-500/10 hover:text-red-400"
+              >
+                <span className="text-xl"><FiLogOut /></span>
+                <span>Logout</span>
+              </button>
             </div>
           </motion.aside>
         )}

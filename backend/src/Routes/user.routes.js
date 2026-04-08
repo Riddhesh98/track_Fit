@@ -3,7 +3,10 @@ import { signup,
          login,
          logout,
          updateProfile ,
-         fetchUserData
+         fetchUserData,
+         getMySubscription,
+         getPendingGymRequests,
+         respondToGymRequest,
      } from "../Controllers/user.controller.js";
 import userMiddleware from "../Middleware/user.middleware.js"; 
 
@@ -19,6 +22,18 @@ router.put("/update",
 router.get("/me",
      userMiddleware,
      fetchUserData);
+
+router.get("/my-subscription",
+     userMiddleware,
+     getMySubscription);
+
+router.get("/gym-requests",
+     userMiddleware,
+     getPendingGymRequests);
+
+router.post("/gym-requests/:linkId",
+     userMiddleware,
+     respondToGymRequest);
 
 
 

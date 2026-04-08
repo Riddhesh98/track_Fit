@@ -56,30 +56,24 @@ const Profile = () => {
     );
   };
 
-  // 🔥 ACCEPT REQUEST
-  const handleAccept = async (requestId) => {
+  // Accept REQUEST
+  const handleAccept = async (linkId) => {
     await axios.post(
-      "http://localhost:3000/api/users/accept-request",
-      { requestId },
+      `http://localhost:3000/api/users/gym-requests/${linkId}`,
+      { action: "accept" },
       { withCredentials: true }
     );
-
-    setRequests((prev) =>
-      prev.filter((req) => req._id !== requestId)
-    );
+    setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
   };
 
-  // 🔥 REJECT REQUEST
-  const handleReject = async (requestId) => {
+  // Reject REQUEST
+  const handleReject = async (linkId) => {
     await axios.post(
-      "http://localhost:3000/api/users/reject-request",
-      { requestId },
+      `http://localhost:3000/api/users/gym-requests/${linkId}`,
+      { action: "reject" },
       { withCredentials: true }
     );
-
-    setRequests((prev) =>
-      prev.filter((req) => req._id !== requestId)
-    );
+    setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
   };
 
   useEffect(() => {
@@ -99,14 +93,15 @@ const Profile = () => {
       setFrequency(response.data.user.frequency);
     };
 
-    // 🔥 FETCH REQUESTS
+    // Fetch gym requests using new endpoint
     const fetchRequests = async () => {
-      const res = await axios.get(
-        "http://localhost:3000/api/users/requests",
-        { withCredentials: true }
-      );
-
-      setRequests(res.data.requests);
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/users/gym-requests",
+          { withCredentials: true }
+        );
+        setRequests(res.data.requests || []);
+      } catch (_) {}
     };
 
     fetchUserData();
@@ -142,31 +137,34 @@ const Profile = () => {
     Gym Requests
   </h2>
 
-  {requests.length === 0 ? (
+      {requests.length === 0 ? (
     <p className="text-xs text-gray-400">
-      No pending requests
+      No pending gym invitations
     </p>
   ) : (
     <div className="space-y-3">
       {requests.map((req) => (
         <div
-          key={req._id}
+          key={req.linkId}
           className="flex items-center justify-between bg-[#121215] p-3 rounded-xl"
         >
-          <p className="text-sm">
-            {req.ownerId?.name || "Gym Owner"}
-          </p>
+          <div>
+            <p className="text-sm">{req.gym?.name || "Gym Owner"}</p>
+            {req.subscription && (
+              <p className="text-xs text-zinc-500">₹{req.subscription.fee} · {req.subscription.durationDays} days</p>
+            )}
+          </div>
 
           <div className="flex gap-2">
             <button
-              onClick={() => handleAccept(req._id)}
+              onClick={() => handleAccept(req.linkId)}
               className="px-3 py-1 text-xs bg-green-600 rounded-lg"
             >
               Accept
             </button>
 
             <button
-              onClick={() => handleReject(req._id)}
+              onClick={() => handleReject(req.linkId)}
               className="px-3 py-1 text-xs bg-red-600 rounded-lg"
             >
               Reject
