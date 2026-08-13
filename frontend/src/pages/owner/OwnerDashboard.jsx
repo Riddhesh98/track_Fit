@@ -1,26 +1,43 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
   FiUsers,
+  FiCheckCircle,
+  FiXCircle,
+  FiClock,
   FiEye,
   FiCreditCard,
   FiSearch,
   FiRefreshCw,
-  FiUserPlus,
   FiAlertCircle,
-  FiTrash2,
 } from "react-icons/fi";
-import OwnerLayout from "../components/OwnerLayout";
-import { ownerFetch } from "../api/ownerApi";
+import OwnerLayout from "../../components/layouts/OwnerLayout";
 
+/* ── Status Badge ── */
 const StatusBadge = ({ status }) => {
   const config = {
-    active: { label: "Active", cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25", dot: "bg-emerald-400" },
-    expired: { label: "Expired", cls: "bg-red-500/15 text-red-400 border-red-500/25", dot: "bg-red-400" },
-    pending: { label: "Pending", cls: "bg-amber-500/15 text-amber-400 border-amber-500/25", dot: "bg-amber-400" },
-    rejected: { label: "Rejected", cls: "bg-gray-500/15 text-gray-400 border-gray-500/25", dot: "bg-gray-400" },
-    none: { label: "No Sub", cls: "bg-gray-500/15 text-gray-400 border-gray-500/25", dot: "bg-gray-400" },
+    active: {
+      label: "Active",
+      cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+      dot: "bg-emerald-400",
+    },
+    expired: {
+      label: "Expired",
+      cls: "bg-red-500/15 text-red-400 border-red-500/25",
+      dot: "bg-red-400",
+    },
+    pending: {
+      label: "Pending",
+      cls: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+      dot: "bg-amber-400",
+    },
+    rejected: {
+      label: "Rejected",
+      cls: "bg-gray-500/15 text-gray-400 border-gray-500/25",
+      dot: "bg-gray-400",
+    },
   };
   const { label, cls, dot } = config[status] ?? config.pending;
   return (
@@ -31,38 +48,43 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const OwnerUsers = () => {
+/* ── Stat Card ── */
+const StatCard = ({ icon: Icon, label, value, color, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="bg-[#111114] border border-white/5 rounded-2xl p-5 flex items-center gap-4 hover:border-white/10 transition-all duration-300 group"
+  >
+    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color} shrink-0 group-hover:scale-110 transition-transform`}>
+      <Icon size={22} className="text-white" />
+    </div>
+    <div>
+      <p className="text-gray-500 text-xs font-medium uppercase tracking-wide">{label}</p>
+      <p className="text-3xl font-black text-white mt-0.5">{value}</p>
+    </div>
+  </motion.div>
+);
+
+/* ── Main Component ── */
+const OwnerDashboard = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [removingId, setRemovingId] = useState(null);
 
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await ownerFetch("/gymOwner/my-users");
-      setUsers(data.users || []);
+      const response = await axios.get("http://localhost:3000/api/gymOwner/my-users", { withCredentials: true });
+      setUsers(response.data.users || []);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleRemove = async (userId, userName) => {
-    if (!window.confirm(`Remove ${userName} from your gym? This will also delete their subscription records.`)) return;
-    setRemovingId(userId);
-    try {
-      await ownerFetch(`/gymOwner/user/${userId}`, { method: "DELETE" });
-      setUsers((prev) => prev.filter((u) => u._id !== userId));
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setRemovingId(null);
     }
   };
 
@@ -74,43 +96,51 @@ const OwnerUsers = () => {
     const matchSearch =
       u.name?.toLowerCase().includes(search.toLowerCase()) ||
       u.email?.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "all" || u.subStatus === filter || u.linkStatus === filter;
+    const matchFilter = filter === "all" || u.subStatus === filter;
     return matchSearch && matchFilter;
   });
 
+  const stats = {
+    total: users.length,
+    active: users.filter((u) => u.subStatus === "active").length,
+    expired: users.filter((u) => u.subStatus === "expired").length,
+    pending: users.filter((u) => u.subStatus === "pending").length,
+  };
+
   return (
     <OwnerLayout>
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-black text-white">Members</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {loading ? "Loading..." : `${users.length} total member${users.length !== 1 ? "s" : ""}`}
-          </p>
-        </div>
-        <button
-          onClick={() => navigate("/owner/add-user")}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition"
-        >
-          <FiUserPlus size={15} /> Add Member
-        </button>
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <h1 className="text-2xl font-black text-white">Dashboard</h1>
+        <p className="text-gray-500 text-sm mt-1">Welcome back! Here's your gym overview.</p>
       </motion.div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard icon={FiUsers} label="Total Members" value={loading ? "—" : stats.total} color="bg-indigo-600" delay={0.05} />
+        <StatCard icon={FiCheckCircle} label="Active Subs" value={loading ? "—" : stats.active} color="bg-emerald-600" delay={0.1} />
+        <StatCard icon={FiXCircle} label="Expired Subs" value={loading ? "—" : stats.expired} color="bg-red-600" delay={0.15} />
+        <StatCard icon={FiClock} label="Pending" value={loading ? "—" : stats.pending} color="bg-amber-600" delay={0.2} />
+      </div>
+
+      {/* Table card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.25 }}
         className="bg-[#111114] border border-white/5 rounded-2xl overflow-hidden"
       >
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-5 border-b border-white/5">
-          <div className="relative flex-1 max-w-xs">
+          <h2 className="text-sm font-semibold text-white flex-1">All Members</h2>
+          <div className="relative">
             <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder="Search members..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition"
+              className="bg-white/5 border border-white/8 rounded-lg pl-8 pr-3 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 transition w-48"
             />
           </div>
           <div className="flex gap-1 bg-white/5 rounded-lg p-1">
@@ -124,8 +154,8 @@ const OwnerUsers = () => {
               </button>
             ))}
           </div>
-          <button onClick={fetchUsers} title="Refresh" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition">
-            <FiRefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          <button onClick={fetchUsers} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition">
+            <FiRefreshCw size={14} />
           </button>
         </div>
 
@@ -153,15 +183,23 @@ const OwnerUsers = () => {
               {users.length === 0 ? "No members yet" : "No members found"}
             </p>
             <p className="text-gray-600 text-sm mt-1">
-              {users.length === 0 ? "Send a request from Add Member to get started" : "Try adjusting your search or filter"}
+              {users.length === 0 ? "Send a request to add your first member" : "Try adjusting your search or filter"}
             </p>
+            {users.length === 0 && (
+              <button
+                onClick={() => navigate("/owner/add-user")}
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm rounded-xl hover:bg-indigo-500 transition"
+              >
+                Add Member
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
-                  {["Name", "Email", "Link Status", "Sub Status", "Days Left", "Actions"].map((h) => (
+                  {["Name", "Email", "Status", "Days Left", "Actions"].map((h) => (
                     <th key={h} className="text-left text-[11px] uppercase tracking-widest text-gray-600 px-5 py-3 font-semibold">{h}</th>
                   ))}
                 </tr>
@@ -184,8 +222,9 @@ const OwnerUsers = () => {
                       </div>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-400">{user.email}</td>
-                    <td className="px-5 py-4"><StatusBadge status={user.linkStatus} /></td>
-                    <td className="px-5 py-4"><StatusBadge status={user.subStatus} /></td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={user.subStatus} />
+                    </td>
                     <td className="px-5 py-4">
                       {user.daysLeft !== null ? (
                         <span className={`text-sm font-semibold ${user.daysLeft <= 3 ? "text-red-400" : user.daysLeft <= 7 ? "text-amber-400" : "text-white"}`}>
@@ -209,14 +248,6 @@ const OwnerUsers = () => {
                         >
                           <FiCreditCard size={13} /> Subscribe
                         </button>
-                        <button
-                          onClick={() => handleRemove(user._id, user.name)}
-                          disabled={removingId === user._id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition disabled:opacity-40"
-                        >
-                          <FiTrash2 size={13} />
-                          {removingId === user._id ? "Removing..." : "Remove"}
-                        </button>
                       </div>
                     </td>
                   </motion.tr>
@@ -230,4 +261,5 @@ const OwnerUsers = () => {
   );
 };
 
-export default OwnerUsers;
+export { OwnerDashboard };
+export default OwnerDashboard;

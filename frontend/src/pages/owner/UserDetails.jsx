@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
   FiArrowLeft,
   FiUser,
@@ -14,8 +15,7 @@ import {
   FiCreditCard,
   FiTrash2,
 } from "react-icons/fi";
-import OwnerLayout from "../components/OwnerLayout";
-import { ownerFetch } from "../api/ownerApi";
+import OwnerLayout from "../../components/layouts/OwnerLayout";
 
 /* ── Section card wrapper ── */
 const Section = ({ title, icon: Icon, children, delay = 0 }) => (
@@ -74,8 +74,8 @@ const UserDetails = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await ownerFetch(`/gymOwner/user/${id}`);
-      setData(result);
+      const response = await axios.get(`http://localhost:3000/api/gymOwner/user/${id}`, { withCredentials: true });
+      setData(response.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -87,7 +87,7 @@ const UserDetails = () => {
     if (!window.confirm(`Remove ${data?.user?.name} from your gym? This will delete their subscription records too.`)) return;
     setRemoving(true);
     try {
-      await ownerFetch(`/gymOwner/user/${id}`, { method: "DELETE" });
+      await axios.delete(`http://localhost:3000/api/gymOwner/user/${id}`, { withCredentials: true });
       navigate("/owner/users");
     } catch (err) {
       alert(err.message);

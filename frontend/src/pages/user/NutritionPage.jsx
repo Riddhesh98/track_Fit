@@ -3,7 +3,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit2, FiTrash2, FiCalendar, FiActivity } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import UserLayout from "../components/UserLayout";
+import UserLayout from "../../components/layouts/UserLayout";
 const NutritionPage = () => {
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");

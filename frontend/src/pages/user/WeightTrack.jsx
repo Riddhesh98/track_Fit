@@ -7,7 +7,7 @@ import {
 import {
   FiActivity, FiCalendar, FiPlus, FiTrendingUp, FiTrash2
 } from "react-icons/fi";
-import UserLayout from "../components/UserLayout";
+import UserLayout from "../../components/layouts/UserLayout";
 
 
 const WeightTrack = () => {

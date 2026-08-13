@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUserPlus,
@@ -10,8 +11,7 @@ import {
   FiAlertCircle,
   FiCreditCard,
 } from "react-icons/fi";
-import OwnerLayout from "../components/OwnerLayout";
-import { ownerFetch } from "../api/ownerApi";
+import OwnerLayout from "../../components/layouts/OwnerLayout";
 
 const DURATION_PRESETS = [
   { label: "1 Month", days: 30 },
@@ -79,11 +79,8 @@ const AddUser = () => {
     }
 
     try {
-      const data = await ownerFetch("/gymOwner/add-user-with-subscription", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      setSuccessData(data);
+      const response = await axios.post("http://localhost:3000/api/gymOwner/add-user-with-subscription", body, { withCredentials: true });
+      setSuccessData(response.data);
       setStatus("success");
     } catch (err) {
       setErrorMsg(err.message);

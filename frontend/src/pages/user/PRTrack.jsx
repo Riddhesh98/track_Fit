@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import UserLayout from "../components/UserLayout";
+import UserLayout from "../../components/layouts/UserLayout";
 import { FiPlus, FiTrash2, FiEdit2, FiClock, FiX, FiCheck } from "react-icons/fi";
 import { FaTrophy } from "react-icons/fa";
 import axios from "axios";
@@ -26,7 +26,6 @@ const PRTrack = () => {
     setPrs(response.data);
   };
 
-  // ✅ EDIT ONLY FILLS FORM (NO API CALL)
   const handleEdit = (item) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setName(item.name);

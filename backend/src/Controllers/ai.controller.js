@@ -1,12 +1,12 @@
-import 'dotenv/config'; // 👈 ADD THIS LINE AT THE TOP
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import 'dotenv/config';
+import { GoogleGenAI } from "@google/genai";
 import { User } from "../models/user.model.js";
 import { Nutrition } from "../Models/nutrition.model.js";
 import { Weight } from "../Models/Weight.model.js";
 import PR from "../Models/PR.model.js";
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Initialize Gemini with new SDK
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const getAICoachResponse = async (req, res) => {
   try {
@@ -84,10 +84,11 @@ export const getAICoachResponse = async (req, res) => {
       `;
 
     // --- STEP 4: SEND TO GEMINI ---
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-    const result = await model.generateContent(systemPrompt);
-    const response = await result.response;
-    const text = response.text();
+    const result = await ai.models.generateContent({
+      model: "gemini-3.1-flash-lite",
+      contents: systemPrompt,
+    });
+    const text = result.text;
 
     // --- STEP 5: SEND REPLY ---
     res.status(200).json({ success: true, reply: text });

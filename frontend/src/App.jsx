@@ -1,21 +1,27 @@
 import { Routes, Route } from 'react-router-dom'
-import ChooseRegister from './pages/ChooseRegister'
-import RegisterUser from './pages/RegisterUser'
-import RegisterOwner from './pages/RegisterOwner'
-import LoginUser from './pages/LoginUser'
-import LoginOwner from './pages/LoginOwner'
-import UserDashboard from './pages/UserDashboard'
-import OwnerDashboard from './pages/OwnerDashboard'
-import OwnerUsers from './pages/OwnerUsers'
-import UserDetails from './pages/UserDetails'
-import AddUser from './pages/AddUser'
-import OwnerSubscription from './pages/OwnerSubscription'
-import NutritionPage from './pages/NutritionPage'
-import NutritionEdit from './pages/NutritionEdit'
-import WeightTrack from './pages/WeightTrack'
-import Profile from './pages/Profile'
-import PRTrack from './pages/PRTrack'
-import AICoach from './pages/AICoach'
+
+// Auth pages
+import ChooseRegister from './pages/auth/ChooseRegister'
+import RegisterUser from './pages/auth/RegisterUser'
+import RegisterOwner from './pages/auth/RegisterOwner'
+import LoginUser from './pages/auth/LoginUser'
+import LoginOwner from './pages/auth/LoginOwner'
+
+// User pages
+import UserDashboard from './pages/user/UserDashboard'
+import NutritionPage from './pages/user/NutritionPage'
+import NutritionEdit from './pages/user/NutritionEdit'
+import WeightTrack from './pages/user/WeightTrack'
+import Profile from './pages/user/Profile'
+import PRTrack from './pages/user/PRTrack'
+import AICoach from './pages/user/AICoach'
+
+// Owner pages
+import OwnerDashboard from './pages/owner/OwnerDashboard'
+import OwnerUsers from './pages/owner/OwnerUsers'
+import UserDetails from './pages/owner/UserDetails'
+import AddUser from './pages/owner/AddUser'
+import OwnerSubscription from './pages/owner/OwnerSubscription'
 
 const App = () => {
   return (

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiSend, FiCpu, FiUser } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
 import axios from "axios";
-import UserLayout from "../components/UserLayout"; 
+import UserLayout from "../../components/layouts/UserLayout"; 
 
 const AICoach = () => {
   const [input, setInput] = useState("");

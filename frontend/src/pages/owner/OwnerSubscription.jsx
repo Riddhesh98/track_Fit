@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 import {
   FiCreditCard,
   FiDollarSign,
@@ -10,8 +11,7 @@ import {
   FiChevronDown,
   FiAlertCircle,
 } from "react-icons/fi";
-import OwnerLayout from "../components/OwnerLayout";
-import { ownerFetch } from "../api/ownerApi";
+import OwnerLayout from "../../components/layouts/OwnerLayout";
 
 const DURATION_PRESETS = [
   { label: "1 Month", days: 30 },
@@ -55,9 +55,9 @@ const OwnerSubscription = () => {
   useEffect(() => {
     if (!userId) {
       setLoadingUsers(true);
-      ownerFetch("/gymOwner/my-users")
-        .then((data) => {
-          const approved = (data.users || []).filter(
+      axios.get("http://localhost:3000/api/gymOwner/my-users", { withCredentials: true })
+        .then((res) => {
+          const approved = (res.data.users || []).filter(
             (u) => u.linkStatus === "approved"
           );
           setLinkedUsers(approved);
@@ -84,14 +84,11 @@ const OwnerSubscription = () => {
     setError("");
 
     try {
-      await ownerFetch("/gymOwner/subscription", {
-        method: "POST",
-        body: JSON.stringify({
-          userId: selectedUserId,
-          fee: Number(fee),
-          durationDays: durationInDays,
-        }),
-      });
+      await axios.post("http://localhost:3000/api/gymOwner/subscription", {
+        userId: selectedUserId,
+        fee: Number(fee),
+        durationDays: durationInDays,
+      }, { withCredentials: true });
       setSuccess(true);
     } catch (err) {
       setError(err.message);

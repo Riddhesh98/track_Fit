@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import Input from "./Input";
+import Input from "../ui/Input";
 
 // Icons
 import {

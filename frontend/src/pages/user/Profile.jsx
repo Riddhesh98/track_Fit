@@ -9,7 +9,7 @@ import {
   FiX
 } from "react-icons/fi";
 import { FaMars } from "react-icons/fa";
-import UserLayout from "../components/UserLayout";
+import UserLayout from "../../components/layouts/UserLayout";
 import axios from "axios";
 import { FiCopy, FiCheck } from "react-icons/fi";
 

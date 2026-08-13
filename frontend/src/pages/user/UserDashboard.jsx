@@ -9,7 +9,7 @@ import {
   FiAlertCircle, FiActivity, FiBell,
 } from "react-icons/fi";
 import { MdOutlineRestaurant } from "react-icons/md";
-import UserLayout from "../components/UserLayout";
+import UserLayout from "../../components/layouts/UserLayout";
 
 const API = "http://localhost:3000/api";
 
