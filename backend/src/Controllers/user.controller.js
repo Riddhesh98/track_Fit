@@ -1,8 +1,5 @@
 import { User } from "../Models/user.model.js";
-import { Subscription } from "../Models/Subscription.model.js";
-import { OwnerUser } from "../Models/OwnerUser.model.js";
-import { GymOwner } from "../Models/gymOwner.model.js";
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 
 
@@ -165,123 +162,25 @@ const fetchUserData= async (req,res) => {
 
 const getMySubscription = async (req, res) => {
     try {
-        const userId = req.user._id;
-
-        // Get the OwnerUser link for this user (most recent approved one)
-        const link = await OwnerUser.findOne({ userId, status: "approved" })
-            .sort({ createdAt: -1 })
-            .populate("ownerId", "name email");
-
-        if (!link) {
-            return res.status(200).json({ message: "No gym linked", subscription: null, gym: null });
-        }
-
-        // Get latest subscription from that owner
-        const subscription = await Subscription.findOne({
-            userId,
-            ownerId: link.ownerId._id,
-        }).sort({ createdAt: -1 }).lean();
-
-        if (!subscription) {
-            return res.status(200).json({ message: "No subscription found", subscription: null, gym: link.ownerId });
-        }
-
-        const now = new Date();
-        const daysLeft = Math.max(0, Math.ceil((new Date(subscription.endDate) - now) / (1000 * 60 * 60 * 24)));
-        const status = daysLeft > 0 ? "active" : "expired";
-
-        return res.status(200).json({message:"Subscription fetched",
-            subscription: { ...subscription, daysLeft, status },
-            gym: link.ownerId,
-        });
+        return res.status(200).json({ message: "No subscription found", subscription: null, gym: null });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }
 
-
-// Get all PENDING gym requests for the logged-in user
 const getPendingGymRequests = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const pendingLinks = await OwnerUser.find({ userId, status: "pending" })
-            .populate("ownerId", "name email")
-            .sort({ createdAt: -1 });
-
-        // Attach subscription info to each pending request
-        const requests = await Promise.all(
-            pendingLinks.map(async (link) => {
-                const subscription = await Subscription.findOne({
-                    userId,
-                    ownerId: link.ownerId._id,
-                }).sort({ createdAt: -1 }).lean();
-
-                return {
-                    linkId: link._id,
-                    gym: link.ownerId,
-                    createdAt: link.createdAt,
-                    subscription: subscription
-                        ? {
-                            fee: subscription.fee,
-                            startDate: subscription.startDate,
-                            endDate: subscription.endDate,
-                            durationDays: Math.round(
-                                (new Date(subscription.endDate) - new Date(subscription.startDate)) /
-                                (1000 * 60 * 60 * 24)
-                            ),
-                        }
-                        : null,
-                };
-            })
-        );
-
-        return res.status(200).json({ message: "Pending requests fetched", requests });
+        return res.status(200).json({ message: "No pending requests", requests: [] });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: error.message });
     }
 };
 
-
-// Accept or reject a gym request
 const respondToGymRequest = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const { linkId } = req.params;
-        const { action } = req.body; // "accept" | "reject"
-
-        if (!action || !["accept", "reject"].includes(action)) {
-            return res.status(400).json({ message: "action must be 'accept' or 'reject'" });
-        }
-
-        const link = await OwnerUser.findOne({ _id: linkId, userId });
-        if (!link) {
-            return res.status(404).json({ message: "Request not found" });
-        }
-        if (link.status !== "pending") {
-            return res.status(400).json({ message: `Request is already ${link.status}` });
-        }
-
-        const newStatus = action === "accept" ? "approved" : "rejected";
-        link.status = newStatus;
-        await link.save();
-
-        // If rejected, delete the pending subscription
-        if (newStatus === "rejected") {
-            await Subscription.deleteMany({ userId, ownerId: link.ownerId, pending: true });
-        } else {
-            // Activate the subscription
-            await Subscription.updateMany(
-                { userId, ownerId: link.ownerId, pending: true },
-                { $unset: { pending: 1 } }
-            );
-        }
-
-        return res.status(200).json({
-            message: action === "accept" ? "Gym request accepted. Your membership is now active!" : "Gym request rejected.",
-            status: newStatus,
-        });
+        return res.status(200).json({ message: "No action required", status: "none" });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: error.message });

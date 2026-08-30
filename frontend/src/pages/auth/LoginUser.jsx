@@ -81,23 +81,12 @@ const LoginUser = () => {
         </form>
 
         {/* Bottom Links */}
-        <div className="mt-10 flex justify-between items-center px-4">
+        <div className="mt-10 flex justify-center items-center">
           <Link
             to="/"
-            className="text-indigo-400 text-[10px] font-bold uppercase hover:text-indigo-300 transition-colors"
+            className="text-indigo-400 text-xs font-bold uppercase hover:text-indigo-300 transition-colors tracking-wider"
           >
-            Register Account
-          </Link>
-
-          {/* Gym Owner switcher — pill style */}
-          <Link
-            to="/login-owner"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-800 text-gray-600 text-[10px] font-bold uppercase tracking-widest hover:border-gray-600 hover:text-gray-300 hover:bg-gray-900/40 transition-all duration-300 group"
-          >
-            <span>Gym Owner</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-            </svg>
+            Don't have an account? Register
           </Link>
         </div>
 
