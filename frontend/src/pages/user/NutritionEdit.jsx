@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { 
   FiActivity, 
-  FiPieChart, 
   FiLayers, 
   FiDroplet, 
   FiTrendingUp, 
@@ -16,7 +14,6 @@ const NutritionEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // State names kept exactly as requested
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
   const [carbs, setCarbs] = useState("");
@@ -24,21 +21,22 @@ const NutritionEdit = () => {
   const [steps, setSteps] = useState("");
 
   const updateHandler = async () => {
+    const numCals = Number(calories);
+    if (!calories || isNaN(numCals) || numCals < 100 || numCals > 10000) return;
+
     const data = {
-      calories: Number(calories), // required
+      calories: numCals,
     };
 
-    if (protein) data.protein = Number(protein);
-    if (carbs) data.carbs = Number(carbs);
-    if (fats) data.fats = Number(fats);
-    if (steps) data.steps = Number(steps);
+    if (protein && !isNaN(Number(protein))) data.protein = Math.max(0, Math.min(500, Number(protein)));
+    if (carbs && !isNaN(Number(carbs))) data.carbs = Math.max(0, Math.min(1000, Number(carbs)));
+    if (fats && !isNaN(Number(fats))) data.fats = Math.max(0, Math.min(300, Number(fats)));
+    if (steps && !isNaN(Number(steps))) data.steps = Math.max(0, Math.min(100000, Number(steps)));
 
-    console.log(data);
     try {
-      const res = await axios.put(`http://localhost:3000/api/nutrition/edit/${id}`, data, {
+      await axios.put(`http://localhost:3000/api/nutrition/edit/${id}`, data, {
         withCredentials: true,
       });
-      console.log(res.data);
       navigate("/nutrition");
     } catch (err) {
       console.error(err.response?.data || err);
@@ -46,50 +44,37 @@ const NutritionEdit = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black flex items-center justify-center p-4">
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl"
-      >
-        {/* Card Container */}
-        <div className="bg-[#09090b] border border-[#27272a] rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#f4f5f7] flex items-center justify-center p-4 sm:p-6 font-sans">
+      <div className="w-full max-w-xl">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
           
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-indigo-600/20 blur-[80px] pointer-events-none"></div>
-
           {/* Header */}
-          <div className="flex items-center gap-5 mb-10 relative z-10">
-            <div className="p-4 bg-[#18181b] rounded-2xl border border-[#27272a] shadow-lg group">
-              <FiActivity className="text-indigo-500 text-2xl group-hover:scale-110 transition-transform" />
-            </div>
+          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
             <div>
-              <h1 className="text-3xl font-black italic uppercase text-white tracking-tighter">
-                Edit <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Log</span>
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Nutrition Edit Engine</span>
+              <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+                Update Macro Record
               </h1>
-              <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.25em] mt-1">
-                Update Daily Stats
-              </p>
             </div>
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FiX size={20} />
+            </button>
           </div>
 
-          {/* Macronutrients Section */}
-          <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-3 mb-5 border-b border-[#27272a] pb-2">
-              <FiPieChart className="text-zinc-500" />
-              <h2 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">
-                Macronutrients
-              </h2>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
+          {/* Form Fields */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputGroup 
                 icon={<FiActivity />} 
-                label="Calories" 
-                placeholder="0" 
+                label="Calories *" 
+                placeholder="2400" 
                 unit="kcal" 
-                color="text-white"
+                color="text-amber-600"
+                min="100"
+                max="10000"
                 required
                 value={calories}
                 onChange={(e) => setCalories(e.target.value)}
@@ -97,108 +82,91 @@ const NutritionEdit = () => {
               <InputGroup 
                 icon={<FiLayers />} 
                 label="Protein" 
-                placeholder="0" 
+                placeholder="175" 
                 unit="g" 
-                color="text-emerald-500"
+                color="text-orange-600"
+                min="0"
+                max="500"
                 value={protein}
                 onChange={(e) => setProtein(e.target.value)}
               />
               <InputGroup 
                 icon={<FiTrendingUp />} 
                 label="Carbs" 
-                placeholder="0" 
+                placeholder="210" 
                 unit="g" 
-                color="text-amber-500"
+                color="text-gray-700"
+                min="0"
+                max="1000"
                 value={carbs}
                 onChange={(e) => setCarbs(e.target.value)}
               />
               <InputGroup 
                 icon={<FiDroplet />} 
                 label="Fats" 
-                placeholder="0" 
+                placeholder="65" 
                 unit="g" 
-                color="text-rose-500"
+                color="text-gray-700"
+                min="0"
+                max="300"
                 value={fats}
                 onChange={(e) => setFats(e.target.value)}
               />
             </div>
-          </div>
 
-          {/* Divider */}
-          <div className="h-px w-full bg-[#27272a] my-10"></div>
-
-          {/* Activity Section */}
-          <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-3 mb-5 border-b border-[#27272a] pb-2">
-              <FiActivity className="text-zinc-500" />
-              <h2 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">
-                Activity
-              </h2>
-            </div>
-
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
-                <FiActivity className="text-indigo-500" />
-              </div>
-              <input 
-                type="number" 
-                placeholder="0" 
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                Steps Count (Optional)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100000"
+                placeholder="10000"
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
-                className="w-full h-20 pl-14 pr-20 bg-[#121215] border border-[#27272a] rounded-2xl text-white placeholder:text-zinc-700 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600/50 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none font-black text-2xl tracking-tight"
+                className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
               />
-              <div className="absolute top-3 left-14 text-[10px] font-bold text-zinc-600 uppercase tracking-widest pointer-events-none">
-                Steps Count
-              </div>
-              <div className="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none">
-                <span className="text-sm font-bold text-zinc-600 uppercase tracking-widest">Steps</span>
-              </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-4 mt-10 relative z-10">
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
             <button 
               onClick={() => navigate(-1)}
-              className="h-14 rounded-xl bg-[#18181b] border border-[#27272a] text-zinc-400 hover:text-white hover:bg-[#27272a] hover:border-zinc-600 transition-all font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+              className="flex-1 h-11 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-colors"
             >
-              <FiX className="text-lg" /> Cancel
+              <FiX size={16} /> Cancel
             </button>
-            
             <button 
               onClick={updateHandler}
-              className="h-14 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/20 transition-all active:scale-[0.98] font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-              <FiCheck className="text-lg" /> Save Update
+              className="flex-1 h-11 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-colors shadow-xs"
+            >
+              <FiCheck size={16} /> Save Record
             </button>
           </div>
 
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
 
-// Reusable Input Component
-// FIXED: Added ...props to receive onChange, value, required, etc.
 const InputGroup = ({ icon, label, placeholder, unit, color, ...props }) => (
-  <div className="relative group">
-    <div className={`absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none ${color} transition-opacity`}>
-      {React.cloneElement(icon, { size: 18 })}
-    </div>
-    
-    <input 
-      type="number" 
-      placeholder={placeholder}
-      {...props} // This passes onChange, value, required to the input
-      className="w-full h-16 pl-14 pr-12 bg-[#121215] border border-[#27272a] rounded-xl text-white placeholder:text-zinc-700 focus:border-indigo-500 focus:bg-[#18181b] outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none font-bold text-lg"
-    />
-    
-    <div className="absolute top-2 left-14 text-[9px] font-black text-zinc-600 uppercase tracking-widest pointer-events-none group-focus-within:text-indigo-400 transition-colors">
+  <div>
+    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
       {label}
-    </div>
-    
-    <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
-      <span className="text-[10px] font-bold text-zinc-600 uppercase">{unit}</span>
+    </label>
+    <div className="relative">
+      <input 
+        type="number" 
+        placeholder={placeholder}
+        {...props}
+        className="w-full h-11 pl-3 pr-10 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+      />
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-bold text-gray-400">
+        {unit}
+      </div>
     </div>
   </div>
 );

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiLock, FiMail, FiArrowRight } from 'react-icons/fi';
 import axios from 'axios';
 
 const LoginUser = () => {
@@ -7,89 +8,123 @@ const LoginUser = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setIsLoading(true);
 
-    const data = {
-      email,
-      password,
-    };
+    const data = { email, password };
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/users/login",
         data,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-
-      console.log(response.data);
 
       if (response.status === 200 || response.status === 201) {
         navigate("/user-dashboard");
       }
     } catch (error) {
       console.log(error);
+      setErrorMsg(error.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-6">
-      <div className="max-w-md w-full">
-        
-        {/* Heading */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-black italic text-white uppercase tracking-tighter">
-            Welcome
-          </h2>
-          <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-3">
-            Athlete Portal
+    <div className="min-h-screen w-full bg-[#f4f5f7] flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-md space-y-6">
+        {/* Brand Logo Header */}
+        <div className="flex flex-col items-center justify-center text-center space-y-2">
+          <div 
+            onClick={() => navigate("/")} 
+            className="cursor-pointer flex items-center gap-2.5 mb-1 select-none group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center font-black text-white text-xs tracking-tighter shadow-sm border border-orange-700 shrink-0 group-hover:bg-orange-700 transition-colors">
+              <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                <path d="M4 4h16v3H13.5v13h-3.5V7H4V4zm10.5 6.5H20v3h-5.5v-3z"/>
+              </svg>
+            </div>
+            <span className="text-2xl font-black tracking-tight text-gray-900 uppercase">
+              TRACK<span className="text-orange-600">FIT</span>
+            </span>
+          </div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+            Athlete Sign In
+          </h1>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+            Access your fitness & nutrition dashboard
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={submitHandler} className="flex flex-col gap-5">
-          
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="Email Address"
-            required
-            className="w-full h-16 px-6 bg-gray-900 border-2 border-gray-800 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all"
-          />
+        {/* Card Form */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-xs space-y-5">
+          {errorMsg && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs font-bold text-center">
+              {errorMsg}
+            </div>
+          )}
 
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Password"
-            required
-            className="w-full h-16 px-6 bg-gray-900 border-2 border-gray-800 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all"
-          />
+          <form onSubmit={submitHandler} className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                Email Address
+              </label>
+              <div className="relative">
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="athlete@trackfit.com"
+                  required
+                  className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-bold text-sm outline-none focus:border-orange-600 transition-colors placeholder:text-gray-400 placeholder:font-normal"
+                />
+              </div>
+            </div>
 
-          {/* Sign In Button */}
-          <button
-            type="submit"
-            className="w-full h-16 bg-indigo-600 text-white font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-500 shadow-2xl transition-all"
-          >
-            Sign In
-          </button>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                Account Password
+              </label>
+              <div className="relative">
+                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type="password"
+                  placeholder="••••••••••••"
+                  required
+                  className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-bold text-sm outline-none focus:border-orange-600 transition-colors placeholder:text-gray-400 placeholder:font-normal"
+                />
+              </div>
+            </div>
 
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white font-bold uppercase text-xs tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 mt-2 shadow-xs"
+            >
+              {isLoading ? "Authenticating..." : (
+                <>Sign In to Dashboard <FiArrowRight size={16} /></>
+              )}
+            </button>
+          </form>
 
-
-        </form>
-
-        {/* Bottom Links */}
-        <div className="mt-10 flex justify-center items-center">
-          <Link
-            to="/"
-            className="text-indigo-400 text-xs font-bold uppercase hover:text-indigo-300 transition-colors tracking-wider"
-          >
-            Don't have an account? Register
-          </Link>
+          <div className="pt-4 text-center border-t border-gray-100">
+            <Link
+              to="/signup-user"
+              className="text-gray-600 text-xs font-bold hover:text-orange-600 transition-colors uppercase tracking-wider inline-flex items-center gap-1"
+            >
+              Don't have an account? <span className="text-orange-600 underline">Register Now</span>
+            </Link>
+          </div>
         </div>
-
       </div>
     </div>
   );

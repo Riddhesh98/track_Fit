@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   FiUser,
-  FiMail,
-  FiActivity,
-  FiSave,
-  FiCamera,
   FiEdit2,
-  FiX
+  FiX,
+  FiCopy,
+  FiCheck
 } from "react-icons/fi";
-import { FaMars } from "react-icons/fa";
 import UserLayout from "../../components/layouts/UserLayout";
 import axios from "axios";
-import { FiCopy, FiCheck } from "react-icons/fi";
 
 const Profile = () => {
-
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,10 +20,7 @@ const Profile = () => {
   const [weight, setWeight] = useState("");
 
   const [mongoDbUserId, setMongoDbUserId] = useState("");
-
-  // 🔥 NEW STATES (REQUESTS)
   const [requests, setRequests] = useState([]);
-
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -49,51 +41,65 @@ const Profile = () => {
       weight
     };
 
-    await axios.put(
-      "http://localhost:3000/api/users/update",
-      data,
-      { withCredentials: true }
-    );
+    try {
+      await axios.put(
+        "http://localhost:3000/api/users/update",
+        data,
+        { withCredentials: true }
+      );
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Accept REQUEST
   const handleAccept = async (linkId) => {
-    await axios.post(
-      `http://localhost:3000/api/users/gym-requests/${linkId}`,
-      { action: "accept" },
-      { withCredentials: true }
-    );
-    setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
+    try {
+      await axios.post(
+        `http://localhost:3000/api/users/gym-requests/${linkId}`,
+        { action: "accept" },
+        { withCredentials: true }
+      );
+      setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Reject REQUEST
   const handleReject = async (linkId) => {
-    await axios.post(
-      `http://localhost:3000/api/users/gym-requests/${linkId}`,
-      { action: "reject" },
-      { withCredentials: true }
-    );
-    setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
+    try {
+      await axios.post(
+        `http://localhost:3000/api/users/gym-requests/${linkId}`,
+        { action: "reject" },
+        { withCredentials: true }
+      );
+      setRequests((prev) => prev.filter((req) => req.linkId !== linkId));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const response = await axios.get(
-        "http://localhost:3000/api/users/me",
-        { withCredentials: true }
-      );
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/users/me",
+          { withCredentials: true }
+        );
 
-      setName(response.data.user.name);
-      setEmail(response.data.user.email);
-      setMongoDbUserId(response.data.user._id);
-      setAge(response.data.user.age);
-      setGender(response.data.user.gender);
-      setHeight(response.data.user.height);
-      setWeight(response.data.user.weight);
-      setFrequency(response.data.user.frequency);
+        setName(response.data.user.name || "");
+        setEmail(response.data.user.email || "");
+        setMongoDbUserId(response.data.user._id || "");
+        setAge(response.data.user.age || "");
+        setGender(response.data.user.gender || "");
+        setHeight(response.data.user.height || "");
+        setWeight(response.data.user.weight || "");
+        setFrequency(response.data.user.frequency || "");
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    // Fetch gym requests using new endpoint
     const fetchRequests = async () => {
       try {
         const res = await axios.get(
@@ -110,184 +116,199 @@ const Profile = () => {
 
   return (
     <UserLayout active="profile">
-      <div className="min-h-screen bg-black text-white flex justify-center p-6">
-        <div className="w-full max-w-2xl space-y-8">
-
-          {/* HEADER */}
-          <div className="text-center space-y-2">
-            <div className="relative w-28 h-28 mx-auto rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 p-[2px]">
-              <div className="w-full h-full rounded-full bg-[#121215] flex items-center justify-center relative group">
-                <FiUser size={40} className="text-indigo-400" />
-                {isEditing && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer">
-                    <FiCamera size={22} />
-                  </div>
-                )}
-              </div>
+      <div className="space-y-8 pb-12">
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-gray-200">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <FiUser className="text-orange-600" size={18} />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">Athlete Identification</span>
             </div>
-
-            <h1 className="text-2xl font-black uppercase">
-              {isEditing ? "Edit Profile" : "My Profile"}
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+              Physical Baseline & Profile
             </h1>
           </div>
 
-          {/* 🔥 NEW REQUEST BOX */}
-          <div className="bg-[#09090b] border border-indigo-500 rounded-2xl p-5">
-  <h2 className="text-sm font-bold uppercase mb-3 text-indigo-400">
-    Gym Requests
-  </h2>
-
-      {requests.length === 0 ? (
-    <p className="text-xs text-gray-400">
-      No pending gym invitations
-    </p>
-  ) : (
-    <div className="space-y-3">
-      {requests.map((req) => (
-        <div
-          key={req.linkId}
-          className="flex items-center justify-between bg-[#121215] p-3 rounded-xl"
-        >
-          <div>
-            <p className="text-sm">{req.gym?.name || "Gym Owner"}</p>
-            {req.subscription && (
-              <p className="text-xs text-zinc-500">₹{req.subscription.fee} · {req.subscription.durationDays} days</p>
-            )}
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleAccept(req.linkId)}
-              className="px-3 py-1 text-xs bg-green-600 rounded-lg"
-            >
-              Accept
-            </button>
-
-            <button
-              onClick={() => handleReject(req.linkId)}
-              className="px-3 py-1 text-xs bg-red-600 rounded-lg"
-            >
-              Reject
-            </button>
-          </div>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors self-start sm:self-auto"
+          >
+            {isEditing ? <FiX size={15} /> : <FiEdit2 size={15} />}
+            {isEditing ? "Cancel Editing" : "Edit Profile"}
+          </button>
         </div>
-      ))}
-    </div>
-  )}
-</div>
-          {/* CARD */}
-          <div className="bg-[#09090b] border border-[#27272a] rounded-3xl p-8 relative">
 
-            <div className="absolute top-6 right-6">
+        {/* GYM REQUESTS BOX */}
+        {requests.length > 0 && (
+          <div className="bg-white border border-orange-200 rounded-xl p-5 shadow-xs space-y-3">
+            <h2 className="text-xs font-black uppercase tracking-wider text-orange-600">
+              Pending Gym Invitations ({requests.length})
+            </h2>
+
+            <div className="space-y-2">
+              {requests.map((req) => (
+                <div
+                  key={req.linkId}
+                  className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
+                >
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">{req.gym?.name || "Gym Owner"}</p>
+                    {req.subscription && (
+                      <p className="text-xs text-gray-500">₹{req.subscription.fee} · {req.subscription.durationDays} days</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAccept(req.linkId)}
+                      className="px-3 py-1.5 text-xs font-bold bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                    >
+                      Accept
+                    </button>
+
+                    <button
+                      onClick={() => handleReject(req.linkId)}
+                      className="px-3 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-colors"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PROFILE BASELINE CARD */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 shadow-xs space-y-6">
+          
+          {/* ID ROW */}
+          <div>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+              Athlete Database ID
+            </label>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                readOnly
+                value={mongoDbUserId}
+                className="w-full h-11 px-3 pr-12 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono font-bold text-gray-700 outline-none"
+              />
               <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl bg-[#18181b] hover:bg-[#27272a]"
+                onClick={handleCopy}
+                className="absolute right-2 p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
+                title="Copy ID"
               >
-                {isEditing ? <FiX /> : <FiEdit2 />}
-                {isEditing ? "Cancel" : "Edit"}
+                {copied ? <FiCheck size={16} className="text-green-600" /> : <FiCopy size={16} />}
               </button>
             </div>
+          </div>
 
-            <div className="space-y-6 mt-6">
-
-              {/* USER ID */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">User ID</p>
-                <div className="relative h-14 bg-[#121215] rounded-xl flex items-center px-4 font-semibold pr-14">
-                  <span className="truncate">{mongoDbUserId}</span>
-                  <button
-                    onClick={handleCopy}
-                    className="absolute right-4 w-8 h-8 rounded-lg bg-[#18181b]"
-                  >
-                    {copied ? <FiCheck /> : <FiCopy />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Name */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Name</p>
-                {isEditing ? (
-                  <input onChange={(e) => setName(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{name}</div>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Email</p>
-                {isEditing ? (
-                  <input onChange={(e) => setEmail(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{email}</div>
-                )}
-              </div>
-
-              {/* Age */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Age</p>
-                {isEditing ? (
-                  <input type="number" onChange={(e) => setAge(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{age}</div>
-                )}
-              </div>
-
-              {/* Height */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Height</p>
-                {isEditing ? (
-                  <input type="number" onChange={(e) => setHeight(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{height}</div>
-                )}
-              </div>
-
-              {/* Weight */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Weight</p>
-                {isEditing ? (
-                  <input type="number" onChange={(e) => setWeight(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{weight}</div>
-                )}
-              </div>
-
-              {/* Gender */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Gender</p>
-                {isEditing ? (
-                  <input onChange={(e) => setGender(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{gender}</div>
-                )}
-              </div>
-
-              {/* Frequency */}
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">Training Frequency</p>
-                {isEditing ? (
-                  <input onChange={(e) => setFrequency(e.target.value)} className="w-full h-14 bg-black border rounded-xl px-4" />
-                ) : (
-                  <div className="h-14 bg-[#121215] rounded-xl flex items-center px-4">{frequency}</div>
-                )}
-              </div>
-
-              {isEditing && (
-                <button
-                  onClick={(e) => {
-                    updateHandler(e);
-                    setIsEditing(false);
-                  }}
-                  className="w-full h-14 bg-white text-black rounded-xl font-bold"
-                >
-                  Save Changes
-                </button>
+          {/* GRID INPUT FIELDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Name</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900">{name || "—"}</div>
               )}
+            </div>
 
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Email</label>
+              {isEditing ? (
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900">{email || "—"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Age</label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="10"
+                  max="120"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900">{age || "—"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Gender</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900 capitalize">{gender || "—"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Height (cm)</label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="50"
+                  max="250"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900">{height ? `${height} cm` : "—"}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Goal Weight (kg)</label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="20"
+                  max="300"
+                  step="0.1"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="w-full h-11 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-orange-600 transition-colors"
+                />
+              ) : (
+                <div className="h-11 px-3 bg-gray-50 border border-gray-200/80 rounded-lg flex items-center font-bold text-sm text-gray-900">{weight ? `${weight} kg` : "—"}</div>
+              )}
             </div>
           </div>
+
+          {isEditing && (
+            <div className="pt-2">
+              <button
+                onClick={updateHandler}
+                className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold text-xs uppercase tracking-wider transition-colors shadow-xs"
+              >
+                Save Baseline Changes
+              </button>
+            </div>
+          )}
+
         </div>
       </div>
     </UserLayout>
